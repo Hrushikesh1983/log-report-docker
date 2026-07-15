@@ -1,64 +1,32 @@
-This is a professional and clear README.md file that explains the fix you
-performed and how the output works. You can copy and paste this directly into a
-new file named README.md in your project folder.
+# Log Report Analysis & Verification Agent
 
-# Log Report Analysis & Verification
+## 📌 Project Overview
+This project is a containerized log analysis tool designed to process server access logs. It uses a Python-based environment to run automated verification tests. The project was built and executed using the Harbor agent framework to ensure secure and reproducible results.
 
-This project is a containerized tool designed to process and validate server access logs. It uses a secure Docker environment to run automated tests via Pytest and the Harbor agent framework.
+## 🛠️ Technical Troubleshooting (The Docker Fix)
+A major part of this project involved ensuring the integrity of the build environment. 
 
-## 🛠️ The Process
+*   **The Problem:** The initial build failed with an `invalid checksum digest length` exception. This was caused by an extra character in the SHA256 digest string in the Dockerfile (65 characters instead of the required 64).
+*   **The Solution:** I used `docker inspect` to pull the exact repository digest from the machine and piped it directly to the clipboard. This eliminated manual transcription errors and successfully fixed the build.
+*   **Security:** The Dockerfile was further optimized to run as a non-root `agent` user to follow security best practices.
 
-The development of this project involved a specific troubleshooting process to ensure container integrity and security:
+## 📂 Understanding the Results (The "Jobs" Folder)
+The output of every run is stored in the `jobs/` directory, organized by unique timestamps.
 
-1.  **Checksum Integrity**: Fixed a "checksum digest length" error by replacing a manually typed 65-character hash with the precise 64-character SHA256 digest from `python:3.12-slim`. 
-2.  **Environment Setup**: Configured a `Dockerfile` using a non-root `agent` user for security best practices.
-3.  **Automated Testing**: Integrated `pytest` and `pytest-json-ctrf` to generate machine-readable test reports from the `access.log` data.
-4.  **Execution**: The process is triggered using the Harbor agent:
-    ```cmd
-    harbor run -p . --agent oracle
-    ```
+### 📍 Which one is the "Original"?
+Because this project involved multiple iterations and testing phases:
+1.  **The Final Output:** The folder with the **latest (most recent) timestamp** is the official and final verified output of this project.
+2.  **Practice History:** All other timestamped folders represent my **practice runs, debugging, and checked versions** created while perfecting the environment and fixing the Docker configuration.
 
-## 📊 Understanding the Output
+### 📄 Output Components
+Inside each job folder (e.g., `jobs/2024-07-15_19-45-00/`), you will find:
+- `result.json`: The final validation status.
+- `verifier/ctrf.json`: The structured test results in CTRF format.
+- `verifier/test-stdout.txt`: The full execution logs from the Python testing suite.
 
-When the agent runs, it generates structured output files. 
+## 🚀 How to Execute
+To build the environment and trigger a new verification job:
 
-*   **Location**: All results are stored in the `jobs/` directory.
-*   **Identification**: Each run creates a unique folder named with a **Timestamp** (e.g., `jobs/2024-07-15_19-16-46/`).
-*   **Result Files**: Inside the timestamped folder, you will find:
-    *   `result.json`: The final pass/fail status.
-    *   `verifier/ctrf.json`: Detailed test results.
-    *   `verifier/test-stdout.txt`: The raw logs from the test execution.
-
-**The timestamped folder in the `jobs` directory serves as the final verified output of the analysis.**
-
-## 📋 Prerequisites
-
-- Docker installed and running.
-- Python 3.12-slim base image.
-- Harbor CLI (for agent execution).
-
-## 🚀 How to Run Locally
-
-1. Clone the repository:
+1. **Build the Docker Image:**
    ```cmd
-   git clone https://github.com/Hrushikesh1983/log-report-docker.git
-
-2.  Build the Docker image:
-    docker build -t log-report .
-3.  Run the analysis:
-    harbor run -p . --agent oracle
-
-
----
-
-### How to add this to your GitHub:
-1.  Open your project folder on your computer.
-2.  Right-click -> **New** -> **Text Document**.
-3.  Rename it to `README.md` (make sure it doesn't end in `.txt`).
-4.  Paste the text above into it and **Save**.
-5.  In your terminal, run these commands to upload it:
-    ```cmd
-    git add README.md
-    git commit -m "Added README explaining output and process"
-    git push
-    ```
+   docker build -t log-report .
